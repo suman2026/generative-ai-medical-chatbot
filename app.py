@@ -22,6 +22,13 @@ groq_chatbot = None
 gemini_chatbot = None
 retriever = None
 
+# Initialize AI models when the module is imported (for serverless)
+def init_app():
+    """Initialize the application"""
+    global groq_chatbot, gemini_chatbot, retriever
+    if groq_chatbot is None and gemini_chatbot is None and retriever is None:
+        initialize_ai_models()
+
 def initialize_ai_models():
     """Initialize all AI models and components"""
     global groq_chatbot, gemini_chatbot, retriever
@@ -209,11 +216,13 @@ Response:"""
 @app.route('/')
 def index():
     """Main page"""
+    init_app()  # Initialize AI models for serverless
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
     """Chat endpoint"""
+    init_app()  # Initialize AI models for serverless
     try:
         data = request.get_json()
         question = data.get('message', '').strip()
